@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+
+<title>D3.js Image Mask Example</title>
+
+<style>
+
+  #image_mask {
+    mask-mode: luminance;
+    webkit-mask-mode: luminance;
+    mask-repeat: no-repeat;
+    webkit-mask-repeat: no-repeat;
+    /* mask-size: 200px;
+    webkit-mask-size: 200px; */
+    mask-position: center;
+    webkit-mask-position: center;
+  }
+
+  </style>
+
+  </head>
+
+  <body>
+
+<!-- d3.js -->
+<script src="http://d3js.org/d3.v3.min.js"></script>
+
+<script>
+
+var svg_width = 900,
+    svg_height = 600,
+    image_height = 574, //image height is 574px
+    image_width = 827, //image width is 827px
+    image_location = "image.png",
+    mask_location = "mask.png";
+
+var svg =  d3.select("body").append("svg")
+          .attr("viewBox", [0, 0, svg_width,svg_height].join(' '));
+
+var g = svg.append("g")
+    .attr("transform", "translate(0, 0) scale(0.25)")
+
+var y_scale = d3.scale.linear()
+      .range([image_height, 0])
+      .domain([0, 100]);
+
+var background_rect = g.append("rect")
+  .attr("class", "image_rect")
+  .attr("x", 5)
+  .attr("y", image_height)
+  .attr("width", image_width - 10)
+  .attr("height", 0)
+  .attr("clip-path", "url(#image_mask)")
+  .style("fill", "orange");
+
+var img_mask = g
+  .append('mask')
+    .attr("id", "image_mask")
+  .append("image")
+    .attr("xlink:href", mask_location)
+    .attr("width", image_width)
+    .attr("height", image_height)
+    .attr("x", 0)
+    .attr("y", 0);
+
+var img = g
+  .append("image")
+    .attr("xlink:href", image_location)
+    .attr("width", image_width)
+    .attr("height", image_height)
+    .attr("x", 0)
+    .attr("y", 0)
+    .attr("mask", "url(#nuclear_mask)");
+
+var inter = setInterval(function() {
+                imgTransition();
+        }, 2000);
+
+function imgTransition(){
+
+  var random_data = Math.floor(Math.random() * 101);
+
+  background_rect.transition()
+    .duration(1000)
+    .ease("linear")
+      .attr("height", image_height - y_scale(random_data))
+      .attr("y", y_scale(random_data));
+};
+
+</script>
+
+  </body>
+</html>
