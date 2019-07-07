@@ -1,95 +1,166 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="utf-8">
+  <meta charset="utf-8">
 
-<title>D3.js Image Mask Example</title>
+  <title>D3.js Image Mask Example</title>
 
-<style>
-
-  #image_mask {
-    mask-mode: luminance;
-    webkit-mask-mode: luminance;
-    mask-repeat: no-repeat;
-    webkit-mask-repeat: no-repeat;
-    /* mask-size: 200px;
-    webkit-mask-size: 200px; */
-    mask-position: center;
-    webkit-mask-position: center;
-  }
+  <style>
 
   </style>
 
-  </head>
+  <!-- d3.js -->
+  <script src="http://d3js.org/d3.v3.min.js"></script>
 
-  <body>
+  <link href="layout.css" rel="stylesheet" type="text/css">
 
-<!-- d3.js -->
-<script src="http://d3js.org/d3.v3.min.js"></script>
+</head>
 
-<script>
+<body>
 
-var svg_width = 900,
-    svg_height = 600,
-    image_height = 574, //image height is 574px
-    image_width = 827, //image width is 827px
-    image_location = "image.png",
-    mask_location = "mask.png";
+  <div class="wrapper">
 
-var svg =  d3.select("body").append("svg")
-          .attr("viewBox", [0, 0, svg_width,svg_height].join(' '));
+    <div class="img_cell">
+      <h4>IMAGE</h4>
+    </div>
+    <div class="plus_cell plus1">+</div>
 
-var g = svg.append("g")
-    .attr("transform", "translate(0, 0) scale(0.25)")
+    <div class="mask_cell">
+      <h4>MASK</h4>
+    </div>
+    <div class="plus_cell plus2">+</div>
 
-var y_scale = d3.scale.linear()
+    <div class="rect_cell">
+      <h4>FILL</h4>
+    </div>
+    <div class="equal_cell">=</div>
+
+    <div class="outcome_cell">
+      <h4>OUTCOME</h4>
+    </div>
+  </div>
+
+  <script>
+    var svg_width = 210,
+      svg_height = 150,
+      image_height = 574, //image height is 574px
+      image_width = 827, //image width is 827px
+      image_location = "image.png",
+      mask_location = "mask.png";
+
+    var y_scale = d3.scale.linear()
       .range([image_height, 0])
       .domain([0, 100]);
 
-var background_rect = g.append("rect")
-  .attr("class", "image_rect")
-  .attr("x", 5)
-  .attr("y", image_height)
-  .attr("width", image_width - 10)
-  .attr("height", 0)
-  .attr("clip-path", "url(#image_mask)")
-  .style("fill", "orange");
+    //Image with transparency
+    var initial_svg = d3.select(".img_cell").append("svg")
+      .attr("width", svg_width)
+      .attr("height", svg_height);
 
-var img_mask = g
-  .append('mask')
-    .attr("id", "image_mask")
-  .append("image")
-    .attr("xlink:href", mask_location)
-    .attr("width", image_width)
-    .attr("height", image_height)
-    .attr("x", 0)
-    .attr("y", 0);
+    var initial_g = initial_svg.append("g")
+      .attr("transform", "translate(0, 0) scale(0.25)");
 
-var img = g
-  .append("image")
-    .attr("xlink:href", image_location)
-    .attr("width", image_width)
-    .attr("height", image_height)
-    .attr("x", 0)
-    .attr("y", 0)
-    .attr("mask", "url(#nuclear_mask)");
+    var initial_img = initial_g
+      .append("image")
+      .attr("xlink:href", image_location)
+      .attr("width", image_width)
+      .attr("height", image_height)
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("mask", "url(#nuclear_mask)");
 
-var inter = setInterval(function() {
-                imgTransition();
-        }, 2000);
+    //Image Mask
+    var mask_svg = d3.select(".mask_cell").append("svg")
+      .attr("width", svg_width)
+      .attr("height", svg_height);
 
-function imgTransition(){
+    var mask_g = mask_svg.append("g")
+      .attr("transform", "translate(0, 0) scale(0.25)");
 
-  var random_data = Math.floor(Math.random() * 101);
+    var mask_img = mask_g
+      .attr("class", "image_mask")
+      .append("image")
+      .attr("xlink:href", mask_location)
+      .attr("width", image_width)
+      .attr("height", image_height)
+      .attr("x", 0)
+      .attr("y", 0);
 
-  background_rect.transition()
-    .duration(1000)
-    .ease("linear")
-      .attr("height", image_height - y_scale(random_data))
-      .attr("y", y_scale(random_data));
-};
+    //Background Fill Rectangle
+    var rect_svg = d3.select(".rect_cell").append("svg")
+      .attr("width", svg_width)
+      .attr("height", svg_height);
 
-</script>
+    var rect_g = rect_svg.append("g")
+      .attr("transform", "translate(0, 0) scale(0.25)");
 
-  </body>
+    var initial_background_rect = rect_g.append("rect")
+      .attr("class", "image_rect")
+      .attr("x", 5)
+      .attr("y", image_height)
+      .attr("width", image_width - 10)
+      .attr("height", 0)
+      .style("fill", "orange");
+
+    //Outcome svg
+    var outcome_svg = d3.select(".outcome_cell").append("svg")
+      .attr("width", svg_width)
+      .attr("height", svg_height);
+
+    var outcome_g = outcome_svg.append("g")
+      .attr("transform", "translate(0, 0) scale(0.25)");
+
+    var outcome_background_rect = outcome_g.append("rect")
+      .attr("class", "image_rect")
+      .attr("x", 5)
+      .attr("y", image_height)
+      .attr("width", image_width - 10)
+      .attr("height", 0)
+      .attr("clip-path", "url(#image_mask)")
+      .style("fill", "orange");
+
+    var outcome_img_mask = outcome_g
+      .append('mask')
+      .attr("class", "image_mask")
+      .append("image")
+      .attr("xlink:href", mask_location)
+      .attr("width", image_width)
+      .attr("height", image_height)
+      .attr("x", 0)
+      .attr("y", 0);
+
+    var outcome_img = outcome_g
+      .append("image")
+      .attr("xlink:href", image_location)
+      .attr("width", image_width)
+      .attr("height", image_height)
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("mask", "url(#nuclear_mask)");
+
+    var inter = setInterval(function () {
+      imgTransition();
+    }, 2000);
+
+    function imgTransition() {
+
+      var random_data = Math.floor(Math.random() * 101);
+
+      initial_background_rect.transition()
+        .duration(1000)
+        .ease("linear")
+        .attr("height", image_height - y_scale(random_data))
+        .attr("y", y_scale(random_data));
+
+      outcome_background_rect.transition()
+        .duration(1000)
+        .ease("linear")
+        .attr("height", image_height - y_scale(random_data))
+        .attr("y", y_scale(random_data));
+    };
+  </script>
+
+</body>
+
 </html>
